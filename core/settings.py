@@ -1,15 +1,22 @@
 import os
 
+from django.utils.crypto import get_random_string
+
+from decouple import config
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'hv13-wx5gu4sayk+umjamk3e)9pg@9mutb6n4iy!yzd5-*&xvw'
+SECRET_KEY = config('SECRET_KEY', default=get_random_string(32))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = config('DEBUG', cast=bool, default='True')
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = config('ALLOWED HOSTS',
+                       cast=lambda x: [s.strip() for s in x.split(',')],
+                       default='127.0.0.1,localhost')
 
 
 # Application definition
