@@ -14,11 +14,41 @@ class UserAuthSerializer(serializers.Serializer):
         users = User.objects.filter(email=email)
         user = users.first()
         if not users or not user.check_password(password):
-            #removed  or not user.is_active in codition.. user is inactive by default
             raise serializers.ValidationError("Email/Password is incorrect. Please try again.")
 
         self.user = user
         return data
 
 
+class UserRegistrationSerializer(serializers.Serializer):
+    """Serializer that creates a user"""
 
+    email = serializers.EmailField(max_length=500)
+    password1 = serializers.CharField(style={'input_type': 'password'})
+    password2 = serializers.CharField(style={'input_type': 'password'})
+    first_name = serializers.CharField(max_length=80)
+    last_name = serializers.CharField(max_length=80)
+
+    def validate(self, data):
+        password1 = data['password1']
+        password2 = data['password2']
+        email = data['email']
+        if password1 != password2:
+            raise serializers.ValidationError("Password does not match")
+        if User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("Email already exists")
+        return data
+
+    def save(self):
+        username=self.validated_data['email']
+        password=self.validated_data['password1']
+        user = User.objects.create(email=username)
+        user.set_password(password)
+        user.save()
+
+class UserSerializer(serializers.ModelSerializer):
+    """Serializer of a user"""
+    
+    class Meta:
+        model = User
+        fields = ('__all__')
