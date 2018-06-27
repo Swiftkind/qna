@@ -1,10 +1,11 @@
 from django.urls import path, include
 from .views import UserAuthView, UsersAPI
 
+
 user_create = UsersAPI.as_view({
     'get': 'list',
     'post': 'create'
-    })
+})
 
 user_login =  UserAuthView.as_view({
         'post':'login',
