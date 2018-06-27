@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import UserAuthView, UsersAPI
+from .views import UsersAPI
 
 
 user_create = UsersAPI.as_view({
@@ -7,9 +7,9 @@ user_create = UsersAPI.as_view({
     'post': 'create'
 })
 
-user_login =  UserAuthView.as_view({
+user_login =  UsersAPI.as_view({
         'post':'login',
-        'get':'user_list',
+        'get':'list',
     })
 
 app_name = 'users'
