@@ -8,26 +8,29 @@ from django.contrib.auth import (
 )
 
 from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework import viewsets
 from rest_framework.authtoken.models import Token
 # Create your views here.
 
 
-class UserAuthView(APIView):
-    serializer_class = UserAuthSerializer
+class UserAuthView(viewsets.ViewSet):
+    """
+    User Authenticaltion when users login
+    """
 
-    def post(self, *args, **kwargs):
-        serializer = self.serializer_class(data=self.request.data)
+    def user_list(self, *args, **kwargs):
+        users = User.objects.all()
+        serializer = UserAuthSerializer(users, many=True)
+        return Response(serializer.data, status=200)
 
-        if serializer.is_valid(raise_exception=True):
-            user = serializer.validated_data['user']
-            login(self.request, user)
-            token, created = Token.objects.get_or_create(user=user)
-            context = {
-                'token':token.key, 
-                'log':user.last_login,
-            }
-            return Response(context,status=200)
-        else:
-            return Response(serializer.errors, status=404)
+    def login(self, *args, **kwargs):
+        serializer = UserAuthSerializer(data=self.request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.user
+        login(self.request, user)
+        token, created = Token.objects.get_or_create(user=user)
+        context = {
+            'token':token.key, 
+            'log':user.last_login,
+        }
+        return Response(context,status=200)
