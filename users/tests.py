@@ -1,52 +1,73 @@
 import unittest
+from django.urls import reverse
 from django.test import Client
 
 
 class SimpleTestCase(unittest.TestCase):
     """Test class for user registration"""
+    url = reverse('users:create')
+
     def setUp(self):
         self.client=Client()
         
     def test_list(self):
-        response = self.client.get('/users/')
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+        response = self.client.post(self.url, {
+                              'email':'carl.ipanag@gmail.com',
+                              'password':'asd',
+                              'password2':'asd',
+                              'first_name':'Shem',
+                              'last_name':'Ipanag'})
+        self.assertEqual(response.status_code, 201)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
 
     def test_errors(self):
-        response = self.client.post('/users/', {
+        response = self.client.post(self.url, {
                               'email':'shem.ipanag@gmail.com',
-                              'password1':'asd',
-                              'password2':'a'})
-        self.assertEqual(response.status_code, 404)
+                              'password':'asd',
+                              'password2':'a',
+                              'first_name':'Shem',
+                              'last_name':'Ipanag'})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data.serializer.is_valid(), False)
 
-        response = self.client.post('/users/', {
+        response = self.client.post(self.url, {
                               'email':'shem.ipanag@gmail.com',
-                              'password1':'a',
-                              'password2':'asd'})
-        self.assertEqual(response.status_code, 404)
+                              'password':'a',
+                              'password2':'asd',
+                              'first_name':'Shem',
+                              'last_name':'Ipanag'})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data.serializer.is_valid(), False)
 
-        response = self.client.post('/users/', {
+        response = self.client.post(self.url, {
                               'email':'shem',
-                              'password1':'asd',
-                              'password2':'asd'})
-        self.assertEqual(response.status_code, 404)
+                              'password':'asd',
+                              'password2':'asd',
+                              'first_name':'Shem',
+                              'last_name':'Ipanag'})
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data.serializer.is_valid(), False)
 
     def test_success(self):
-        response = self.client.post('/users/', {
+        response = self.client.post(self.url, {
                               'email':'shem.ipanag@gmail.com',
-                              'password1':'asd',
+                              'password':'asd',
                               'password2':'asd',
                               'first_name':'Shem',
                               'last_name':'Ipanag'})
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 201)
 
-    def test_username(self):
-        response = self.client.post('/users/', {
+    def test_usernametaken(self):
+        response = self.client.post(self.url, {
                               'email':'shem.ipanag@gmail.com',
-                              'password1':'asd',
+                              'password':'asd',
                               'password2':'asd',
                               'first_name':'Shem',
                               'last_name':'Ipanag'})
-        self.assertEqual(response.status_code, 404)
-
-    def test_login(self):
-        self.client.login(username='shem.ipanag@gmail.com', password='as')
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.data.serializer.is_valid(), False)
