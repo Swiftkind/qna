@@ -50,9 +50,4 @@ class User(AbstractBaseUser, PermissionsMixin):
     @property
     def trimmed_email(self):
         return self.email.split("@")[0]
-
-# class PasswordHash(models.Model):
-#     """ password hash model
-#     """
-#     hash = models.
         
