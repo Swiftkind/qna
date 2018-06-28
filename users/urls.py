@@ -17,11 +17,12 @@ user_details = UserAPI.as_view({
     'post':'edit',
 })
 
-user_get_hash = UserAPI.as_view({
-    'get': 'get_hash'
+user_get_hash = GuestAPI.as_view({
+    'post': 'get_hash'
 })
 
 user_changepass = UserAPI.as_view({
+    'get': 'check_valid',
     'post': 'changepass'
 })
 

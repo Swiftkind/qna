@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from rest_framework.compat import authenticate
-from .models import User
+<<<<<<< 71107817f8ed867f9748b1b5cff45e1689c1f2d8
+from .models import User, Confirmation
 from rest_framework.validators import UniqueValidator
 
 class UserAuthSerializer(serializers.Serializer):
@@ -80,6 +81,29 @@ class UserEditSerializer(serializers.Serializer):
         user.handle = self.validated_data['handle']
         user.save()
 
+class ConfirmationSerializer(serializers.ModelSerializer):
+    """Serializer of a changepass confirmation"""
+    email = serializers.EmailField(write_only=True)
+    url = serializers.CharField(max_length=500, read_only=True)
+
+    class Meta:
+        model = Confirmation
+        fields =['url', 'email']
+
+    def validate(self, data):
+        email = data['email']
+        if not User.objects.filter(email=email).exists():
+            raise serializers.ValidationError("Invalid email")
+        return data
+
+    def save(self):
+        email = self.validated_data['email']
+        user = User.objects.get(email=email)
+        self.validated_data.pop('email')
+        confirmation = Confirmation.objects.create(user=user)
+        confirmation.save()
+
+
 class ChangepassSerializer(serializers.Serializer):
     """Serializer of a user"""
     password2 = serializers.CharField(write_only=True)
@@ -96,3 +120,4 @@ class ChangepassSerializer(serializers.Serializer):
         user = User.objects.get(id=id)
         user.set_password(self.validated_data['password'])
         user.save()
+        confirmation = Confirmation.objects.filter(user=user).delete()

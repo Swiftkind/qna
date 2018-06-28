@@ -2,8 +2,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.test import force_authenticate
-from .models import User
-import unittest
+from .models import User, Confirmation
 from django.urls import reverse
 from django.test import Client
 
@@ -33,12 +32,102 @@ class UserLoginTest(APITestCase):
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-class UserRegisterTest(unittest.TestCase):
+
+class UserChangepass(APITestCase):
+    """
+    Test class for user changepass.
+    """
+
+    def test_get_hash(self):
+        url = reverse('users:get_hash')
+        user = User.objects.create_user(email='test@example.com', password='sample')
+        data = {'email': 'test@example.com'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        data = {'email': 'test@example.com'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+        data = {'email': 'errortest@example.com'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 400)
+
+    def test_check_valid(self):
+        # Create a user and a unique hashed link to change password
+        url = reverse('users:get_hash')
+        user = User.objects.create_user(email='test@example.com',
+                                        password='sample')
+        data = {'email': 'test@example.com'}
+        response = self.client.post(url, data)
+
+        # Setup the url
+        user_query = User.objects.get(email='test@example.com')
+        confirmation = Confirmation.objects.filter(user=user_query)
+        url = reverse('users:changepass', args={str(confirmation[0].id)})
+
+        # Unauthorized user uses the link
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 401)
+
+        # Authorized user uses the link
+        self.client.force_authenticate(user=user)
+        url = reverse('users:changepass', args={str(confirmation[0].id)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        # Create a different user
+        url = reverse('users:get_hash')
+        user = User.objects.create_user(email='anothertest@example.com',
+                                        password='sample')
+
+        # Different user uses the link
+        self.client.force_authenticate(user=user)
+        url = reverse('users:changepass', args={str(confirmation[0].id)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_changepass(self):
+        # Create a user and a unique hashed link to change password
+        url = reverse('users:get_hash')
+        user = User.objects.create_user(email='test@example.com',
+                                        password='sample')
+        data = {'email': 'test@example.com'}
+        response = self.client.post(url, data)
+
+        # Setup the url
+        user_query = User.objects.get(email='test@example.com')
+        confirmation = Confirmation.objects.filter(user=user_query)
+        url = reverse('users:changepass', args={str(confirmation[0].id)})
+
+        # Authorized user uses the link
+        self.client.force_authenticate(user=user)
+        url = reverse('users:changepass', args={str(confirmation[0].id)})
+        response = self.client.get(url)
+
+        # User mismatches password
+        data = {'password':'asd', 'password2':'a'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 400)
+
+        # User changes password
+        data = {'password':'asd', 'password2':'asd'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+
+        # Hash link is deleted
+        self.assertEqual(len(confirmation), 0)
+
+        # User logs in with new password
+        url = reverse('users:user_login')
+        data = {'email': 'test@example.com', 'password': 'asd'}
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+
+
+class UserRegistration(APITestCase):
     """Test class for user registration"""
     url = reverse('users:create')
-
-    def setUp(self):
-        self.client=Client()
         
     def test_list(self):
         response = self.client.get(self.url)
@@ -92,7 +181,7 @@ class UserRegisterTest(unittest.TestCase):
                               'last_name':'Ipanag'})
         self.assertEqual(response.status_code, 201)
 
-    def test_usernametaken(self):
+        # Email is taken
         response = self.client.post(self.url, {
                               'email':'shem.ipanag@gmail.com',
                               'password':'asd',
