@@ -45,3 +45,21 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create(**self.validated_data)
         user.set_password(self.validated_data['password'])
         user.save()
+
+
+class ChangepassSerializer(serializers.Serializer):
+    """Serializer of a user"""
+    password2 = serializers.CharField(write_only=True)
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        password = data['password']
+        password2 = data['password2']
+        if password != password2:
+            raise serializers.ValidationError("Password does not match")
+        return data
+
+    def save(self, id):
+        user = User.objects.get(id=id)
+        user.set_password(self.validated_data['password'])
+        user.save()
