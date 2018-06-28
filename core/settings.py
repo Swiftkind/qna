@@ -123,3 +123,9 @@ try:
 except ImportError as e:
     if "local_settings" not in str(e):
         raise e
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    )
+}
