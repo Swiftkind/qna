@@ -3,11 +3,11 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer, UserAuthSerializer
+from .serializers import UserSerializer, UserAuthSerializer, UserDetailSerializer
 from .models import User
 
 
-class UserRegistrationAPI(ViewSet):
+class GuestAPI(ViewSet):
     """User API"""
 
     def list(self, *args, **kwargs):
@@ -44,6 +44,13 @@ class UserAPI(ViewSet):
         """lists all users"""
         user = User.objects.all()
         serializer = UserSerializer(user, many=True)
+        return Response(serializer.data, status=200)
+
+    def details(self, *args, **kwargs):
+        """view details of a user"""
+        handle = self.kwargs.get('handle', None)
+        instance = User.objects.get(handle=handle)
+        serializer = UserDetailSerializer(instance)
         return Response(serializer.data, status=200)
 
     def changepass(self, *args, **kwargs):
