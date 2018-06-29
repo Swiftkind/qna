@@ -3,7 +3,6 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 from rest_framework.test import force_authenticate
 from .models import User, Confirmation
-from django.urls import reverse
 from django.test import Client
 
 
@@ -117,7 +116,7 @@ class UserChangepass(APITestCase):
         self.assertEqual(len(confirmation), 0)
 
         # User logs in with new password
-        url = reverse('users:user_login')
+        url = reverse('users:login')
         data = {'email': 'test@example.com', 'password': 'asd'}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
