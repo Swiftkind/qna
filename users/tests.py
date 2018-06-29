@@ -44,11 +44,9 @@ class UserChangepass(APITestCase):
         data = {'email': 'test@example.com'}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 1)
         data = {'email': 'test@example.com'}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.data), 2)
         data = {'email': 'errortest@example.com'}
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 400)

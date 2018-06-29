@@ -1,4 +1,5 @@
 from django.contrib.auth import login
+from django.core.mail import send_mail
 from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework.permissions import IsAuthenticated
@@ -14,7 +15,8 @@ class GuestAPI(ViewSet):
     """Guest API"""
 
     def list(self, *args, **kwargs):
-        """lists all users"""
+        """lists all users
+        """
         user = User.objects.all()
         serializer = UserSerializer(user, many=True)
         return Response(serializer.data, status=200)
@@ -40,14 +42,18 @@ class GuestAPI(ViewSet):
         return Response(context,status=200)
 
     def get_hash(self, *args, **kwargs):
-        """submits a user email to generate confirmation"""
+        """submits a user email to generate confirmation
+        """
         serializer = ConfirmationSerializer(data=self.request.data)
         if serializer.is_valid():
-            user = User.objects.get(email=serializer.validated_data['email'])
-            serializer.save()
-            confirmation = Confirmation.objects.filter(user=user)
-            serializer = ConfirmationSerializer(confirmation, many=True)
-            return Response(serializer.data, status=200)
+            subject = 'changepass link'
+            from_email = 'carl.ipanag@gmail.com'
+            to_email = serializer.validated_data['email']
+            url = serializer.save()
+            text_content = f"{self.request.get_host()}{url}"
+            send_mail(subject, text_content, from_email, [to_email])
+
+            return Response(status=200)
         return Response(status=400)
 
 
@@ -56,7 +62,8 @@ class UserAPI(ViewSet):
     permission_classes = (IsAuthenticated,)
         
     def check_valid(self, *args, **kwargs):
-        """returns status=200 if hashed link is valid"""
+        """returns status=200 if hashed link is valid
+        """
         confirmation = Confirmation.objects.get(pk=self.kwargs['hash'])
         if confirmation and confirmation.user == self.request.user:
             return Response(status=200)
