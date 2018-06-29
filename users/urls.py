@@ -14,9 +14,6 @@ user_login =  GuestAPI.as_view({
 
 user_details = UserAPI.as_view({
     'get':'details',
-})
-
-user_edit = UserAPI.as_view({
     'post':'edit',
 })
 
@@ -35,5 +32,4 @@ urlpatterns = [
     path('gethash/', user_get_hash, name='get_hash'),
     path('reset/<str:hash>', user_changepass, name='changepass'),
     path('<str:handle>/', user_details, name='details'),
-    path('<str:handle>/edit', user_edit, name='edit'),
 ]

@@ -132,7 +132,7 @@ class UserEditTest(APITestCase):
     Test if new data when editing a profile is valid
     """
     def test_edit_correct(self):
-        url = reverse('users:edit', kwargs={'handle':'test'})
+        url = reverse('users:details', kwargs={'handle':'test'})
         user = User.objects.create_user(
             email='test@example.com', 
             password='sample',
@@ -151,7 +151,7 @@ class UserEditTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_no_changes(self):
-        url = reverse('users:edit', kwargs={'handle':'test'})
+        url = reverse('users:details', kwargs={'handle':'test'})
         user = User.objects.create_user(
             email='test@example.com', 
             password='sample',
@@ -170,7 +170,7 @@ class UserEditTest(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_email_exists(self):
-        url = reverse('users:edit', kwargs={'handle':'test'})
+        url = reverse('users:details', kwargs={'handle':'test'})
         user = User.objects.create_user(
             email='test@example.com', 
             password='sample',
