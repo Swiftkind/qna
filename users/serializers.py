@@ -102,6 +102,7 @@ class ConfirmationSerializer(serializers.ModelSerializer):
         self.validated_data.pop('email')
         confirmation = Confirmation.objects.create(user=user)
         confirmation.save()
+        return confirmation.url
 
 
 class ChangepassSerializer(serializers.Serializer):
