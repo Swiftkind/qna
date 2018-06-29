@@ -8,33 +8,32 @@ from django.urls import reverse
 from django.test import Client
 
 
-class UserAuth(APITestCase):
+class UserLoginTest(APITestCase):
     """
     Ensure we can login a user.
     """
-
     def test_correct_login(self):
-        url = reverse('users:user_login')
+        url = reverse('users:login')
         user = User.objects.create_user(email='test@example.com', password='sample')
         data = {'email': 'test@example.com', 'password': 'sample'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_incorrect_password(self):
-        url = reverse('users:user_login')
+        url = reverse('users:login')
         user = User.objects.create_user(email='test@example.com', password='sample')
         data = {'email': 'test@example.com', 'password': 'adsadsa'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_user_not_exist(self):
-        url = reverse('users:user_login')
+        url = reverse('users:login')
         user = User.objects.create_user(email='test@example.com', password='sample')
         data = {'email': 'notexist@example.com', 'password': 'sample'}
         response = self.client.post(url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
-class SimpleTestCase(unittest.TestCase):
+class UserRegisterTest(unittest.TestCase):
     """Test class for user registration"""
     url = reverse('users:create')
 
@@ -102,3 +101,28 @@ class SimpleTestCase(unittest.TestCase):
                               'last_name':'Ipanag'})
         self.assertEqual(response.status_code, 400)
         self.assertEqual(response.data.serializer.is_valid(), False)
+
+class UserDetailTest(APITestCase):
+    """
+    Test if we can get the details of a user
+    """
+    def test_detail_correct(self):
+        url = reverse('users:details', kwargs={'handle':'test'})
+        user = User.objects.create_user(email='test@example.com', password='sample')
+        self.client.force_authenticate(user=user)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_detail_other_user(self):
+        url = reverse('users:details', kwargs={'handle':'anotheruser'})
+        user = User.objects.create_user(email='test@example.com', password='sample')
+        user2 = User.objects.create_user(email='anotheruser@example.com', password='user')
+        self.client.force_authenticate(user=user)
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_detail_unauthorized(self):
+        url = reverse('users:details', kwargs={'handle':'test'})
+        user = User.objects.create_user(email='test@example.com', password='sample')
+        response = self.client.get(url, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

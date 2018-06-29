@@ -45,6 +45,13 @@ class UserSerializer(serializers.ModelSerializer):
         user = User.objects.create(**self.validated_data)
         user.set_password(self.validated_data['password'])
         user.save()
+        
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    """Serializer of a user's details"""
+    class Meta:
+        model = User
+        fields = ['email', 'first_name', 'last_name', 'handle', 'date_joined']
 
 
 class ChangepassSerializer(serializers.Serializer):
