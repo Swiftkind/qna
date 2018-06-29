@@ -126,3 +126,71 @@ class UserDetailTest(APITestCase):
         user = User.objects.create_user(email='test@example.com', password='sample')
         response = self.client.get(url, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+class UserEditTest(APITestCase):
+    """
+    Test if new data when editing a profile is valid
+    """
+    def test_edit_correct(self):
+        url = reverse('users:edit', kwargs={'handle':'test'})
+        user = User.objects.create_user(
+            email='test@example.com', 
+            password='sample',
+            first_name='Test',
+            last_name='User',
+            handle='test',
+        )
+        self.client.force_authenticate(user=user)
+        data = {
+            'email':'newtest@example.com',
+            'first_name':'AnotherTest',
+            'last_name':'AnotherUser',
+            'handle':'newtest'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_no_changes(self):
+        url = reverse('users:edit', kwargs={'handle':'test'})
+        user = User.objects.create_user(
+            email='test@example.com', 
+            password='sample',
+            first_name='Test',
+            last_name='User',
+            handle='test',
+        )
+        self.client.force_authenticate(user=user)
+        data = {
+            'email':'test@example.com',
+            'first_name':'Test',
+            'last_name':'User',
+            'handle':'test'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_email_exists(self):
+        url = reverse('users:edit', kwargs={'handle':'test'})
+        user = User.objects.create_user(
+            email='test@example.com', 
+            password='sample',
+            first_name='Test',
+            last_name='User',
+            handle='test',
+        )
+        user2 = User.objects.create_user(
+            email='newtest@example.com', 
+            password='sample',
+            first_name='Test',
+            last_name='User',
+            handle='test',
+        )
+        self.client.force_authenticate(user=user)
+        data = {
+            'email':'newtest@example.com',
+            'first_name':'AnotherTest',
+            'last_name':'AnotherUser',
+            'handle':'newtest'
+        }
+        response = self.client.post(url, data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

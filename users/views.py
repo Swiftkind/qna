@@ -3,7 +3,12 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ViewSet
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer, UserAuthSerializer, UserDetailSerializer
+from .serializers import (
+        UserSerializer, 
+        UserAuthSerializer, 
+        UserDetailSerializer,
+        UserEditSerializer,
+)
 from .models import User
 
 
@@ -51,6 +56,21 @@ class UserAPI(ViewSet):
         handle = self.kwargs.get('handle', None)
         instance = User.objects.get(handle=handle)
         serializer = UserDetailSerializer(instance)
+        return Response(serializer.data, status=200)
+
+    def edit(self, *args, **kwargs):
+        """Edit details of a user"""
+        handle = self.request.user.handle
+        instance = User.objects.get(handle=handle)
+
+        serializer = UserEditSerializer(
+            data=self.request.data, 
+            context={'request':self.request}
+        )
+
+        serializer.is_valid(raise_exception=True)
+        serializer.save(handle=handle)
+
         return Response(serializer.data, status=200)
 
     def changepass(self, *args, **kwargs):
