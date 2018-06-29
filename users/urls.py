@@ -29,7 +29,7 @@ app_name = 'users'
 urlpatterns = [
     path('create/', user_create, name='create'),
     path('login/', user_login, name='login'),
-    path('<str:handle>/', user_details, name='details'),
     path('gethash/', user_get_hash, name='get_hash'),
     path('reset/<str:hash>/', user_changepass, name='changepass'),
+    path('<str:handle>/', user_details, name='details'),
 ]
