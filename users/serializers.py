@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from rest_framework.compat import authenticate
 from .models import User
+from rest_framework.validators import UniqueValidator
 
 class UserAuthSerializer(serializers.Serializer):
-    email = serializers.EmailField(label='Email Address')
+    email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
     user = None
 
@@ -53,6 +54,31 @@ class UserDetailSerializer(serializers.ModelSerializer):
         model = User
         fields = ['email', 'first_name', 'last_name', 'handle', 'date_joined']
 
+class UserEditSerializer(serializers.Serializer):
+    """Serializer when editing a user"""
+    email = serializers.EmailField()
+    first_name = serializers.CharField(max_length=80)
+    last_name = serializers.CharField(max_length=80)
+    handle = serializers.CharField(max_length=150)
+
+    def validate(self, data):
+        email = data.get('email')
+        current_user = self.context['request'].user.email
+        emails = User.objects.filter(email=email).exclude(email=current_user)
+        # import pdb; pdb.set_trace()
+
+        if emails.exists():
+            raise serializers.ValidationError("Email already exists!")
+
+        return data
+
+    def save(self, handle=None):
+        user = User.objects.get(handle=handle)
+        user.email = self.validated_data['email']
+        user.first_name = self.validated_data['first_name']
+        user.last_name =  self.validated_data['last_name']
+        user.handle = self.validated_data['handle']
+        user.save()
 
 class ChangepassSerializer(serializers.Serializer):
     """Serializer of a user"""
