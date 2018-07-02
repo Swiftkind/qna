@@ -1,8 +1,11 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
-import { HttpModule } from '@angular/http';
 
+import { UIRouterModule } from '@uirouter/angular';
+
+import { APP_STATES } from './commons/states/app.states';
+
+import { PublicModule } from './components/public/public.module';
 import { AppComponent } from './app.component';
 
 @NgModule({
@@ -11,8 +14,8 @@ import { AppComponent } from './app.component';
   ],
   imports: [
     BrowserModule,
-    FormsModule,
-    HttpModule
+    UIRouterModule.forRoot(APP_STATES),
+    PublicModule
   ],
   providers: [],
   bootstrap: [AppComponent]
