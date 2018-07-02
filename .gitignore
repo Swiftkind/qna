@@ -1,6 +1,7 @@
 *.pyc
 *.sqlite3
 core/local_settings.py
+*.DS_Store
 
 *__pycache__
 static/
