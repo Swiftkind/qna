@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from rest_framework.compat import authenticate
-<<<<<<< 71107817f8ed867f9748b1b5cff45e1689c1f2d8
 from .models import User, Confirmation
 from rest_framework.validators import UniqueValidator
 
