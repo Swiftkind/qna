@@ -7,7 +7,7 @@ from django.views.generic.base import TemplateView
 
 
 urlpatterns = [
-    path('questions/', include('questions.urls')),
+    path('api/questions/', include('questions.urls')),
     path('users/', include('users.urls')),
     path('admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

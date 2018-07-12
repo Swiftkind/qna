@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { StateService } from '@uirouter/angular';
 
 @Component({
   selector: 'app-index',
@@ -7,7 +8,11 @@ import { Component, OnInit } from '@angular/core';
 })
 export class IndexComponent implements OnInit {
 
-  constructor() { }
+  keyword = '';
+
+  constructor(
+      private stateService: StateService,
+  ) { }
 
   ngOnInit() {
   }

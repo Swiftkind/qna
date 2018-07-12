@@ -7,13 +7,19 @@ question_list = QuestionAPI.as_view({
     'post': 'create',
 })
 
+question_search = QuestionAPI.as_view({
+    'get': 'list',
+    'post': 'search',
+})
+
 question_details = QuestionAPI.as_view({
     'get':'details',
     'post':'edit',
 })
 
-app_name = 'questions'
+app_name = 'api'
 urlpatterns = [
     path('', question_list, name='list'),
+    path('search/', question_search, name='search'),
     path('<str:code>/', question_details, name='details'),
 ]
