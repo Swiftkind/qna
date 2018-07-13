@@ -1,8 +1,18 @@
+<app-search-form></app-search-form>
 <h1>RESULTS</h1>
+<app-question-filter></app-question-filter>
 <ul>
-    <li *ngFor="let question of questions$">
+    <li *ngFor="let question of questions$.results">
         <ul>
-            <li>{{ question.id }}</li>
+            <li>{{ question.title }}</li>
+            <li>{{ question.content }}</li>
+            <li>{{ question.user }}</li>
+            <li>{{ question.categories }}</li>
+            <li>{{ question.tags }}</li>
         </ul>
     </li>
+    <span *ngIf="questions$ && !questions$.results.length">No results found</span>
 </ul>
+<div *ngIf="questions$.total_pages > 1">
+	<button *ngFor="let x of counter(questions$.total_pages); let i = index" (click)="goToPage(i+1)">{{ i+1 }}</button>
+</div>

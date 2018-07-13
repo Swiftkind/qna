@@ -1,9 +1,3 @@
+// export const API_DOMAIN = 'localhost:8000'
 
-export class QuestionURL{
-    public static get API_QUESTION_URL():string {
-        return '/questions/';
-    }
-    public static API_DETAILS_URL(code:string):string {
-        return '/questions/'+code;
-    }
-}
+export const QUESTIONS_API_SEARCH = (page: string, keyword: string): string => '/api/questions/?page='+page+'&keyword='+keyword;

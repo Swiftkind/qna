@@ -41,6 +41,38 @@ class QuestionAPI(APITestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.data), 1)
 
+        # Search non-existing questions
+        response = self.client.get(url+'?keyword=blah')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 0)
+
+        # Create 10 questions
+        for x in range(10):
+            response = self.client.post(url, {
+                                'title':str(x),
+                                'content':'sample content',
+                                'categories':[1],
+                                'tags':[1]})
+            self.assertEqual(response.status_code, 201)
+
+        # List 1st page of questions
+        response = self.client.get(url+'?page=1')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 10)
+
+        # List 2nd page of questions
+        response = self.client.get(url+'?page=2')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+
+        # Search existing questions
+        response = self.client.get(url+'?keyword=title')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 1)
+        response = self.client.get(url+'?keyword=sample')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 10)
+
     def test_edit(self):
         # Setup database
         user = User.objects.create_user(email='test@example.com', password='sample')

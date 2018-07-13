@@ -4,6 +4,7 @@ import { IndexComponent } from './index/index.component';
 import { SearchComponent } from './search/search.component';
 import { GlobalModule } from '../global/global.module';
 import { SearchFormComponent } from '../global/forms/search-form/search-form.component';
+import { QuestionFilterComponent } from '../global/filters/question-filter/question-filter.component';
 import { FormsModule as MyFormsModule } from '@angular/forms';
 
 @NgModule({
@@ -12,6 +13,6 @@ import { FormsModule as MyFormsModule } from '@angular/forms';
     GlobalModule,
     MyFormsModule
   ],
-  declarations: [IndexComponent, SearchComponent, SearchFormComponent]
+  declarations: [IndexComponent, SearchComponent, SearchFormComponent, QuestionFilterComponent]
 })
 export class PublicModule { }

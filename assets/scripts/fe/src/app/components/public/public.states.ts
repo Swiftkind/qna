@@ -9,7 +9,7 @@ export const PUBLIC_STATES : Object[] = [
     views: ContentOnly(IndexComponent) 
   },
   { name : 'search',
-    url  : '/search',
+    url  : '/search/',
     views: ContentOnly(SearchComponent) 
   }
 ]

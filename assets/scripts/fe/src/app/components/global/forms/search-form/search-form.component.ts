@@ -19,8 +19,13 @@ export class SearchFormComponent implements OnInit {
   }
 
   search(searchForm: NgForm){
-      console.log(searchForm.value)
-      this.searchService.postQuestions('1',searchForm.value);
-      this.stateService.go('search')
+      if (searchForm.value.keyword != '') {
+        this.searchService.searchQuestions(searchForm.value.keyword);
+
+        this.stateService.go('search');
+        if(this.stateService.$current.url.pattern == '/search/'){
+          this.stateService.reload();
+        }
+      }
   }
 }
