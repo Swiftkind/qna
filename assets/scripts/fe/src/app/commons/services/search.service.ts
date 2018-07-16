@@ -19,7 +19,7 @@ export class SearchService {
       return this.http.get(QUESTIONS_API_SEARCH(page, this.data));
   }
 
-  searchQuestions(data: string){ 
+  searchQuestions(data: string){
       this.data = data;
   }
 

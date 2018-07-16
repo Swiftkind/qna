@@ -12,4 +12,8 @@ export class QuestionFilterComponent implements OnInit {
   ngOnInit() {
   }
 
+  sort(){
+  	console.log("YEAH");
+  }
+
 }

@@ -18,35 +18,22 @@ class QuestionAPI(GenericViewSet, ListModelMixin):
         """
         overrides default queryset
         """
-        try:
-            keyword = self.request.GET['keyword']
-        except:
-            keyword = ''
+        keyword = self.request.GET.get('keyword', '')
+        sortby = self.request.GET.get('sort', 'id')
 
         questions = Question.objects.filter(
                             Q(title__icontains=keyword)|
                             Q(content__icontains=keyword)|
                             Q(categories__name__icontains=keyword)|
-                            Q(tags__name__icontains=keyword)).distinct()
+                            Q(tags__name__icontains=keyword)
+                            ).order_by(sortby).distinct()
 
-        queryset = questions
-        return queryset
+        return questions
 
     def list(self, request, *args, **kwargs):
         """
         lists questions
         """
-
-        try:
-            keyword = self.request.GET['keyword']
-        except:
-            keyword = ''
-
-        questions = Question.objects.filter(
-                            Q(title__icontains=keyword)|
-                            Q(content__icontains=keyword)|
-                            Q(categories__name__icontains=keyword)|
-                            Q(tags__name__icontains=keyword)).distinct()
 
         return super(QuestionAPI, self).list(request, *args, **kwargs)
 
@@ -76,5 +63,5 @@ class QuestionAPI(GenericViewSet, ListModelMixin):
             serializer = self.serializer_class(data=self.request.data)
             if serializer.is_valid():
                 serializer.update(question.id)
-                return Response(status=201)
+                return Response(status=200)
         return Response(status=400)
